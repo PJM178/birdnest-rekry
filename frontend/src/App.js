@@ -31,7 +31,9 @@ const App = () => {
       }]);
     } else if (pilotCheck) {
       console.log('pilot in array:', pilotCheck.pilot.firstName, distance);
-      setViolations(violations.map(item => (item.pilot.pilotId === pilot.pilotId ? { ...item, time: Date.now(), distance: distance } : item)));
+      const newDistance = pilotCheck.distance < distance ? pilotCheck.distance : distance;
+      console.log(newDistance);
+      setViolations(violations.map(item => (item.pilot.pilotId === pilot.pilotId ? { ...item, time: Date.now(), distance: newDistance } : item)));
     }
   };
 
@@ -54,18 +56,27 @@ const App = () => {
     timeout();
   }, [timer]);
 
-  // const timeFilteredViolations = violations.filter(item => item.time + 10000 >= Date.now());
-  // console.log(timeFilteredViolations);
 
   return (
     <div>
-      <ScatterPlot drones={drones}/>
-      <h1>Drones</h1>
-      <Drones drones={drones} />
-      <h1>Violating persons in the last 10 minutes - elapsed time: {<TimerTest />} seconds</h1>
-      {violations.filter(item => item.time + 600000 >= Date.now()).map(item =>
-        <div key={item.pilot.pilotId}>Name: {item.pilot.firstName} - Distance: {item.distance}</div>
-      )}
+      <div style={{ display: 'flex' }}>
+        <div style={{ height: 'fit-content' }}>
+          <ScatterPlot drones={drones}/>
+          <div style={{ alignItems: 'center', display: 'flex', flexDirection: 'column' }}>
+            <h3>Drones in the area</h3>
+            <div><Drones drones={drones} /></div>
+          </div>
+        </div>
+        <div>
+          <h3>Violating persons in the last 10 minutes - elapsed time: {<TimerTest />} seconds</h3>
+          <div>
+            {violations.filter(item => item.time + 600000 >= Date.now()).map(item =>
+              <div key={item.pilot.pilotId}>Name: {item.pilot.firstName} - Distance: {item.distance}</div>
+            )}
+          </div>
+        </div>
+      </div>
+
     </div>
   );
 };
