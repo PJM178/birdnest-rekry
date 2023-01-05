@@ -1,0 +1,73 @@
+import droneService from './services/drones';
+import pilotService from './services/pilots';
+import { useState, useEffect } from 'react';
+
+import Drones from './components/Drones';
+import TimerTest from './components/TimerTest';
+import ScatterPlot from './components/ScatterPlot';
+
+const App = () => {
+  const [drones, setDrones] = useState([]);
+  const [timer, setTimer] = useState(1);
+  const [violations, setViolations] = useState([]);
+
+  const timeout = () => {
+    setTimeout(() => {
+      console.log('tik-tok', timer);
+      setTimer(timer+1);
+    }, 2000);
+  };
+
+  const findPilot = async (drone, distance) => {
+    const pilot = await pilotService.getPilot(drone.serialNumber);
+    const pilotCheck = violations.find(item => item.pilot.pilotId === pilot.pilotId);
+    if (pilotCheck === undefined) {
+      console.log('pilot not in array:', pilot.firstName, distance);
+      setViolations(violations => [...violations, {
+        pilot: pilot,
+        drone: drone,
+        distance: distance,
+        time: Date.now()
+      }]);
+    } else if (pilotCheck) {
+      console.log('pilot in array:', pilotCheck.pilot.firstName, distance);
+      setViolations(violations.map(item => (item.pilot.pilotId === pilot.pilotId ? { ...item, time: Date.now(), distance: distance } : item)));
+    }
+  };
+
+  const countViolations = (drones) => {
+    drones.forEach(drone => {
+      const distance = Math.sqrt((250000 - drone.positionX) ** 2 + (250000 - drone.positionY) ** 2)/1000;
+      if (distance < 100) {
+        findPilot(drone, distance);
+      }
+    });
+  };
+
+  useEffect(() => {
+    const getDrones = async () => {
+      const drones = await droneService.getAllDrones();
+      countViolations(drones.report.capture.drone);
+      setDrones(drones.report.capture.drone);
+    };
+    getDrones();
+    timeout();
+  }, [timer]);
+
+  // const timeFilteredViolations = violations.filter(item => item.time + 10000 >= Date.now());
+  // console.log(timeFilteredViolations);
+
+  return (
+    <div>
+      <ScatterPlot drones={drones}/>
+      <h1>Drones</h1>
+      <Drones drones={drones} />
+      <h1>Violating persons in the last 10 minutes - elapsed time: {<TimerTest />} seconds</h1>
+      {violations.filter(item => item.time + 600000 >= Date.now()).map(item =>
+        <div key={item.pilot.pilotId}>Name: {item.pilot.firstName} - Distance: {item.distance}</div>
+      )}
+    </div>
+  );
+};
+
+export default App;
