@@ -24,7 +24,6 @@ dronesRouter.get('/', async (request, response) => {
     if (validatedDrones === true) {
       const dronesJson = new XMLParser().parse(drones.data);
       response.status(200).json(dronesJson);
-      console.log('ping');
     // If false, return error along with relevant status
     } else if (validatedDrones.err) {
       const error = validatedDrones.err.msg;
