@@ -15,7 +15,7 @@ const App = () => {
     setTimeout(() => {
       console.log('tik-tok', timer);
       setTimer(timer+1);
-    }, 2000);
+    }, 5000);
   };
 
   const findPilot = async (drone, distance) => {
@@ -29,7 +29,8 @@ const App = () => {
         distance: distance,
         time: Date.now()
       }]);
-    } else if (pilotCheck) {
+    }
+    if (pilotCheck) {
       console.log('pilot in array:', pilotCheck.pilot.firstName, distance);
       const newDistance = pilotCheck.distance < distance ? pilotCheck.distance : distance;
       console.log(newDistance);
@@ -49,8 +50,8 @@ const App = () => {
   useEffect(() => {
     const getDrones = async () => {
       const drones = await droneService.getAllDrones();
-      countViolations(drones.report.capture.drone);
       setDrones(drones.report.capture.drone);
+      countViolations(drones.report.capture.drone);
     };
     getDrones();
     timeout();
@@ -69,7 +70,6 @@ const App = () => {
         </div>
         <Pilots violations={violations} />
       </div>
-
     </div>
   );
 };
