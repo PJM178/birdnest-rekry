@@ -3,8 +3,8 @@ import pilotService from './services/pilots';
 import { useState, useEffect } from 'react';
 
 import Drones from './components/Drones';
-import TimerTest from './components/TimerTest';
 import ScatterPlot from './components/ScatterPlot';
+import Pilots from './components/Pilots';
 
 const App = () => {
   const [drones, setDrones] = useState([]);
@@ -67,14 +67,7 @@ const App = () => {
             <div><Drones drones={drones} /></div>
           </div>
         </div>
-        <div>
-          <h3>Violating persons in the last 10 minutes - elapsed time: {<TimerTest />} seconds</h3>
-          <div>
-            {violations.filter(item => item.time + 600000 >= Date.now()).map(item =>
-              <div key={item.pilot.pilotId}>Name: {item.pilot.firstName} - Distance: {item.distance}</div>
-            )}
-          </div>
-        </div>
+        <Pilots violations={violations} />
       </div>
 
     </div>
