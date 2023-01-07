@@ -15,13 +15,36 @@ const App = () => {
     setTimeout(() => {
       console.log('tik-tok', timer);
       setTimer(timer+1);
-    }, 5000);
+    }, 3000);
   };
 
+  // Original code before bug solving
+  // const findPilot = async (drone, distance) => {
+  //   const pilot = await pilotService.getPilot(drone.serialNumber);
+  //   const pilotCheck = violations.find(item => item.pilot.pilotId === pilot.pilotId);
+  //   if (pilotCheck === undefined) {
+  //     console.log('pilot not in array:', pilot.firstName, distance);
+  //     setViolations(violations => [...violations, {
+  //       pilot: pilot,
+  //       drone: drone,
+  //       distance: distance,
+  //       time: Date.now()
+  //     }]);
+  //   } else {
+  //     console.log('pilot in array:', pilotCheck.pilot.firstName, distance);
+  //     const newDistance = pilotCheck.distance < distance ? pilotCheck.distance : distance;
+  //     console.log(newDistance);
+  //     setViolations(violations.map(item => (item.pilot.pilotId === pilot.pilotId ? { ...item, time: Date.now(), distance: newDistance } : item)));
+  //   }
+  // };
+
+  // Trying to solve a bug where if two violations happen simultaneously where
+  // one pilot is in array and another one is not, the non-array pilot doesn't get
+  // added to the list
   const findPilot = async (drone, distance) => {
-    const pilot = await pilotService.getPilot(drone.serialNumber);
-    const pilotCheck = violations.find(item => item.pilot.pilotId === pilot.pilotId);
+    const pilotCheck = violations.find(item => item.drone.serialNumber === drone.serialNumber);
     if (pilotCheck === undefined) {
+      const pilot = await pilotService.getPilot(drone.serialNumber);
       console.log('pilot not in array:', pilot.firstName, distance);
       setViolations(violations => [...violations, {
         pilot: pilot,
@@ -29,16 +52,15 @@ const App = () => {
         distance: distance,
         time: Date.now()
       }]);
-    }
-    if (pilotCheck) {
+    } else {
       console.log('pilot in array:', pilotCheck.pilot.firstName, distance);
       const newDistance = pilotCheck.distance < distance ? pilotCheck.distance : distance;
       console.log(newDistance);
-      setViolations(violations.map(item => (item.pilot.pilotId === pilot.pilotId ? { ...item, time: Date.now(), distance: newDistance } : item)));
+      setViolations(violations.map(item => (item.drone.serialNumber === drone.serialNumber ? { ...item, time: Date.now(), distance: newDistance } : item)));
     }
   };
 
-  const countViolations = (drones) => {
+  const countViolations = async (drones) => {
     drones.forEach(drone => {
       const distance = Math.sqrt((250000 - drone.positionX) ** 2 + (250000 - drone.positionY) ** 2)/1000;
       if (distance < 100) {
