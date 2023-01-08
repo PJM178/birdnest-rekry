@@ -46,16 +46,6 @@ const App = () => {
     });
   };
 
-  // refactor to use for loop instead of forEach to test the effect of await
-  // const countViolations = (drones) => {
-  //   for (let i = 0; i < drones.length ; i++) {
-  //     const distance = Math.sqrt((250000 - drones[i].positionX) ** 2 + (250000 - drones[i].positionY) ** 2)/1000;
-  //     if (distance < 100) {
-  //       findPilot(drones[i], distance);
-  //     }
-  //   }
-  // };
-
   useEffect(() => {
     const getDrones = async () => {
       const drones = await droneService.getAllDrones();

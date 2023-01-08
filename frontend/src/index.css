@@ -23,6 +23,7 @@ code {
   top: 0;
   overflow: auto;
   background-color: rgba(0, 0, 0, 0.1);
+  overflow: auto;
 }
 
 .modal-content {

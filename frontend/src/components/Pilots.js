@@ -1,20 +1,20 @@
 import { useState } from 'react';
 
-import InfoModal from './InfoModal';
 import TimerTest from './TimerTest';
+import InfoModal from './InfoModal';
 
 const Pilots = ({ violations }) => {
   const [modal, setModal] = useState(false);
   const [pilot, setPilot] = useState([]);
 
-  const imageContainerStyle = {
+  const hoverContainerStyle = {
     transition: 'transform .1s',
     display: 'none',
     zIndex: '2',
     position: 'absolute'
   };
 
-  const imageSizeStyle = {
+  const hoverSizeStyle = {
     width: 'auto',
     height: 'auto',
     border: '1px solid',
@@ -37,7 +37,7 @@ const Pilots = ({ violations }) => {
     test.addEventListener('mousemove', getMouse(e, i));
   };
 
-  const hideImage = (i) => {
+  const hidecontent = (i) => {
     const image = document.getElementById(`hover-container-${i}`);
     image.style.display = 'none';
   };
@@ -51,21 +51,27 @@ const Pilots = ({ violations }) => {
     <div>
       <h3 style={{ marginBottom: '5px' }}>Violating persons in the last 10 minutes - elapsed time: {<TimerTest />} seconds</h3>
       <div>
-        {violations.filter(item => item.time + 600000 >= Date.now()).map((item, i) =>
-          <div key={item.pilot.pilotId}>
-            <a id={`link-${i}`} href="#" onMouseMove={(event) => mouseContent(event, i)} onMouseLeave={() => hideImage(i)}>{item.pilot.firstName} - {item.distance.toFixed(2)} meters</a><button onClick={() => pilotInfo(item)}>show info</button>
-            <div id={`hover-container-${i}`} style={imageContainerStyle}>
-              <div id={`hover-size-${i}`} style={imageSizeStyle}>
-                <div>Name: {item.pilot.firstName} {item.pilot.lastName}</div>
-                <div>Email: {item.pilot.email}</div>
-                <div>Phone number: {item.pilot.phoneNumber}</div>
-                <div>Shortest distance to the nest: <div>{item.distance.toFixed(2)} meters</div></div>
+        {violations.map((item, i) =>
+          item.time + 600000 >= Date.now()
+            ?
+            <div key={item.pilot.pilotId}>
+              <a id={`link-${i}`} href="#" onMouseMove={(event) => mouseContent(event, i)}
+                onMouseLeave={() => hidecontent(i)}>{item.pilot.firstName} - {item.distance.toFixed(2)} meters</a>
+              <button onClick={() => pilotInfo(item)}>show info</button>
+              <InfoModal setModal={setModal} modal={modal} item={pilot} violations={violations} i={i} />
+              <div id={`hover-container-${i}`} style={hoverContainerStyle}>
+                <div id={`hover-size-${i}`} style={hoverSizeStyle}>
+                  <div>Name: {item.pilot.firstName} {item.pilot.lastName}</div>
+                  <div>Email: {item.pilot.email}</div>
+                  <div>Phone number: {item.pilot.phoneNumber}</div>
+                  <div>Shortest distance to the nest: <div>{item.distance.toFixed(2)} meters</div></div>
+                </div>
               </div>
             </div>
-          </div>
+            :
+            null
         )}
       </div>
-      {modal ? <InfoModal setModal={setModal} imageSizeStyle={imageSizeStyle} item={pilot} /> : null}
     </div>
   );
 };
