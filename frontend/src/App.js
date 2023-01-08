@@ -15,7 +15,7 @@ const App = () => {
     setTimeout(() => {
       console.log('tik-tok', timer);
       setTimer(timer+1);
-    }, 3000);
+    }, 5000);
   };
 
   const findPilot = async (drone, distance) => {

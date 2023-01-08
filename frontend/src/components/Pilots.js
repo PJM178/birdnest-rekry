@@ -58,7 +58,6 @@ const Pilots = ({ violations }) => {
               <a id={`link-${i}`} href="#" onMouseMove={(event) => mouseContent(event, i)}
                 onMouseLeave={() => hidecontent(i)}>{item.pilot.firstName} - {item.distance.toFixed(2)} meters</a>
               <button onClick={() => pilotInfo(item)}>show info</button>
-              <InfoModal setModal={setModal} modal={modal} item={pilot} violations={violations} i={i} />
               <div id={`hover-container-${i}`} style={hoverContainerStyle}>
                 <div id={`hover-size-${i}`} style={hoverSizeStyle}>
                   <div>Name: {item.pilot.firstName} {item.pilot.lastName}</div>
@@ -71,6 +70,7 @@ const Pilots = ({ violations }) => {
             :
             null
         )}
+        <InfoModal setModal={setModal} modal={modal} item={pilot} violations={violations} />
       </div>
     </div>
   );
