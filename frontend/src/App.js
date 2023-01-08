@@ -18,29 +18,6 @@ const App = () => {
     }, 3000);
   };
 
-  // Original code before bug solving
-  // const findPilot = async (drone, distance) => {
-  //   const pilot = await pilotService.getPilot(drone.serialNumber);
-  //   const pilotCheck = violations.find(item => item.pilot.pilotId === pilot.pilotId);
-  //   if (pilotCheck === undefined) {
-  //     console.log('pilot not in array:', pilot.firstName, distance);
-  //     setViolations(violations => [...violations, {
-  //       pilot: pilot,
-  //       drone: drone,
-  //       distance: distance,
-  //       time: Date.now()
-  //     }]);
-  //   } else {
-  //     console.log('pilot in array:', pilotCheck.pilot.firstName, distance);
-  //     const newDistance = pilotCheck.distance < distance ? pilotCheck.distance : distance;
-  //     console.log(newDistance);
-  //     setViolations(violations.map(item => (item.pilot.pilotId === pilot.pilotId ? { ...item, time: Date.now(), distance: newDistance } : item)));
-  //   }
-  // };
-
-  // Trying to solve a bug where if two violations happen simultaneously where
-  // one pilot is in array and another one is not, the non-array pilot doesn't get
-  // added to the list
   const findPilot = async (drone, distance) => {
     const pilotCheck = violations.find(item => item.drone.serialNumber === drone.serialNumber);
     if (pilotCheck === undefined) {
@@ -54,13 +31,13 @@ const App = () => {
       }]);
     } else {
       console.log('pilot in array:', pilotCheck.pilot.firstName, distance);
-      const newDistance = pilotCheck.distance < distance ? pilotCheck.distance : distance;
+      const newDistance = pilotCheck.distance <= distance ? pilotCheck.distance : distance;
       console.log(newDistance);
-      setViolations(violations.map(item => (item.drone.serialNumber === drone.serialNumber ? { ...item, time: Date.now(), distance: newDistance } : item)));
+      setViolations(violations => violations.map(item => (item.drone.serialNumber === drone.serialNumber ? { ...item, time: Date.now(), distance: newDistance } : item)));
     }
   };
 
-  const countViolations = async (drones) => {
+  const countViolations = (drones) => {
     drones.forEach(drone => {
       const distance = Math.sqrt((250000 - drone.positionX) ** 2 + (250000 - drone.positionY) ** 2)/1000;
       if (distance < 100) {
@@ -68,6 +45,16 @@ const App = () => {
       }
     });
   };
+
+  // refactor to use for loop instead of forEach to test the effect of await
+  // const countViolations = (drones) => {
+  //   for (let i = 0; i < drones.length ; i++) {
+  //     const distance = Math.sqrt((250000 - drones[i].positionX) ** 2 + (250000 - drones[i].positionY) ** 2)/1000;
+  //     if (distance < 100) {
+  //       findPilot(drones[i], distance);
+  //     }
+  //   }
+  // };
 
   useEffect(() => {
     const getDrones = async () => {
